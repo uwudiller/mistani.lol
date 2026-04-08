@@ -86,21 +86,33 @@ export async function getTrendingAnime(page = 1): Promise<{ anime: Anime[], hasM
   }
 }
 
-export async function getAnimeById(malId: number): Promise<Anime | null> {
-  try {
-    const response = await fetch(`${JIKAN_BASE_URL}/anime/${malId}/full`)
-    
-    if (!response.ok) {
+export async function getAnimeById(malId: number, retries = 3): Promise<Anime | null> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(`${JIKAN_BASE_URL}/anime/${malId}/full`, {
+        next: { revalidate: 3600 }
+      })
+      
+      if (response.ok) {
+        const data: JikanAnime = await response.json()
+        return mapJikanToAnime(data)
+      }
+      
+      if (response.status === 429) {
+        await new Promise(r => setTimeout(r, 1000 * (i + 1)))
+        continue
+      }
+      
       throw new Error('Failed to fetch anime details')
+    } catch (error) {
+      if (i === retries - 1) {
+        console.error('Error fetching anime details:', error)
+        return null
+      }
+      await new Promise(r => setTimeout(r, 1000))
     }
-    
-    const data: JikanAnime = await response.json()
-    
-    return mapJikanToAnime(data)
-  } catch (error) {
-    console.error('Error fetching anime details:', error)
-    return null
   }
+  return null
 }
 
 function mapJikanToAnime(jikanAnime: JikanAnime): Anime {

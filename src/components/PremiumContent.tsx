@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { ArrowLeft, Crown, Zap, CheckCircle, Star, Gift } from 'lucide-react'
+import { ArrowLeft, Crown, Zap, CheckCircle, Star, Gift, Loader2, Sparkles, Shield, Clock } from 'lucide-react'
 
 interface PremiumStatus {
   is_premium: boolean
@@ -12,14 +12,24 @@ interface PremiumStatus {
   premium_amount?: number
 }
 
+const PREMIUM_TIERS = [
+  { amount: 5, months: 1, label: '1 Month', popular: false },
+  { amount: 10, months: 2, label: '2 Months', popular: true },
+  { amount: 25, months: 5, label: '5 Months', popular: false },
+  { amount: 50, months: 12, label: '1 Year', popular: false },
+]
+
 export default function PremiumContent() {
   const session = useSession()
   const [premiumStatus, setPremiumStatus] = useState<PremiumStatus | null>(null)
   const [loading, setLoading] = useState(true)
+  const [processing, setProcessing] = useState(false)
 
   useEffect(() => {
     if (session.status === 'authenticated') {
       fetchPremiumStatus()
+    } else if (session.status === 'unauthenticated') {
+      setLoading(false)
     }
   }, [session.status])
 
@@ -37,30 +47,54 @@ export default function PremiumContent() {
     }
   }
 
+  const handleKoFiDonate = (amount: number) => {
+    setProcessing(true)
+    const koFiUrl = `https://ko-fi.com/mistlol/?donate=checkout&amount=${amount}&hide_ghipping=true`
+    window.open(koFiUrl, '_blank', 'noopener,noreferrer')
+    setTimeout(() => setProcessing(false), 2000)
+  }
+
   if (session.status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center">
+        <Loader2 className="w-12 h-12 text-amber-500 animate-spin mb-4" />
+        <p className="text-white text-lg">Loading...</p>
       </div>
     )
   }
 
   if (!session.data) {
-    return null
+    return (
+      <div className="min-h-screen bg-gray-900">
+        <header className="bg-gray-800 border-b border-gray-700">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <Link href="/" className="inline-flex items-center space-x-2 text-amber-500 hover:text-amber-400 transition-colors">
+              <ArrowLeft className="w-5 h-5" />
+              <span>Back to Home</span>
+            </Link>
+          </div>
+        </header>
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+          <Crown className="w-20 h-20 text-amber-500 mx-auto mb-6 animate-float" />
+          <h1 className="text-4xl font-bold text-white mb-4">Sign in to view Premium</h1>
+          <p className="text-gray-400 mb-8">Create an account or sign in to access premium features</p>
+          <Link href="/auth/signin" className="inline-block bg-amber-500 hover:bg-amber-400 text-black px-8 py-3 rounded-lg font-semibold transition-all hover:scale-105">
+            Sign In
+          </Link>
+        </main>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      {/* Header */}
-      <header className="bg-gray-800 border-b border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-900 text-white">
+      <header className="bg-gray-800 border-b border-gray-700 sticky top-0 z-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/" className="text-amber-500 hover:text-amber-400 transition-colors flex items-center space-x-2">
-                <ArrowLeft className="w-5 h-5" />
-                <span>Back to Home</span>
-              </Link>
-            </div>
+            <Link href="/" className="flex items-center space-x-2 text-amber-500 hover:text-amber-400 transition-colors group">
+              <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+              <span>Back to Home</span>
+            </Link>
             <div className="flex items-center space-x-2">
               <Crown className="w-5 h-5 text-amber-500" />
               <span className="text-white font-semibold">Premium</span>
@@ -70,118 +104,136 @@ export default function PremiumContent() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="text-center mb-12">
-          <Crown className="w-16 h-16 text-amber-500 mx-auto mb-4" />
-          <h1 className="text-4xl font-bold text-white mb-4">mistani.lol Premium</h1>
-          <p className="text-xl text-gray-300">Unlock the ultimate anime streaming experience</p>
+        <div className="text-center mb-12 animate-fadeIn">
+          <div className="inline-block p-4 bg-amber-500/20 rounded-full mb-6 animate-pulse-glow">
+            <Crown className="w-16 h-16 text-amber-500" />
+          </div>
+          <h1 className="text-5xl font-bold text-white mb-4">
+            <span className="text-amber-500">mistani</span>.lol Premium
+          </h1>
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            Unlock the ultimate anime streaming experience with lightning-fast speeds and no throttling
+          </p>
         </div>
 
         {premiumStatus?.is_premium ? (
-          // Premium user view
-          <div className="space-y-8">
-            <div className="bg-gradient-to-r from-amber-500 to-yellow-500 rounded-lg p-8 text-center">
-              <Crown className="w-12 h-12 text-black mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-black mb-2">Premium Active!</h2>
-              <p className="text-black mb-4">
-                You have premium access until {new Date(premiumStatus.premium_expires || '').toLocaleDateString()}
-              </p>
-              <div className="bg-black bg-opacity-20 rounded-lg p-4 inline-block">
-                <p className="text-black font-semibold">
-                  {premiumStatus.days_remaining} days remaining
+          <div className="space-y-8 animate-slideUp">
+            <div className="bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-500 rounded-2xl p-8 text-center animate-gradient">
+              <div className="bg-black/20 rounded-xl p-6 inline-block">
+                <Crown className="w-16 h-16 text-black mx-auto mb-2" />
+                <h2 className="text-3xl font-bold text-black mb-2">Premium Active!</h2>
+                <p className="text-black/80 text-lg">
+                  Valid until {new Date(premiumStatus.premium_expires || '').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                 </p>
+                <div className="mt-4 bg-black/30 rounded-lg px-6 py-3 inline-block">
+                  <span className="text-black font-bold text-xl">{premiumStatus.days_remaining} days remaining</span>
+                </div>
               </div>
             </div>
 
-            <div className="bg-gray-800 rounded-lg p-6">
-              <h3 className="text-xl font-semibold text-white mb-4">Your Premium Benefits</h3>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Zap className="w-6 h-6 text-amber-500" />
-                  <span className="text-gray-300">Lightning-fast streaming speeds</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { icon: Zap, title: 'Lightning-Fast Streaming', desc: 'Buffer-free anime with our fastest servers' },
+                { icon: Shield, title: 'No Speed Limits', desc: 'Unlimited streaming without throttling' },
+                { icon: Star, title: 'Premium Badge', desc: 'Show off your support with a special badge' },
+                { icon: Gift, title: 'Support the Platform', desc: 'Help keep mistani.lol running ad-free' },
+              ].map((benefit, i) => (
+                <div 
+                  key={benefit.title} 
+                  className="bg-gray-800 rounded-xl p-6 flex items-start space-x-4 hover-lift"
+                  style={{ animationDelay: `${i * 100}ms` }}
+                >
+                  <benefit.icon className="w-8 h-8 text-amber-500 flex-shrink-0" />
+                  <div>
+                    <h3 className="text-white font-semibold mb-1">{benefit.title}</h3>
+                    <p className="text-gray-400 text-sm">{benefit.desc}</p>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="w-6 h-6 text-amber-500" />
-                  <span className="text-gray-300">No speed throttling</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Star className="w-6 h-6 text-amber-500" />
-                  <span className="text-gray-300">Premium badge on your profile</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Gift className="w-6 h-6 text-amber-500" />
-                  <span className="text-gray-300">Support the mistani.lol platform</span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         ) : (
-          // Free user view
           <div className="space-y-8">
-            <div className="bg-gray-800 rounded-lg p-6">
-              <h3 className="text-xl font-semibold text-white mb-4">Why Go Premium?</h3>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-3">
-                  <Zap className="w-6 h-6 text-amber-500" />
-                  <div>
-                    <h4 className="text-white font-semibold">Lightning-Fast Streaming</h4>
-                    <p className="text-gray-400 text-sm">Enjoy buffer-free anime streaming with our fastest servers</p>
+            <div className="bg-gray-800 rounded-2xl p-8 animate-slideUp">
+              <h2 className="text-2xl font-bold text-white mb-6 text-center">Premium Benefits</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  { icon: Zap, title: 'Lightning-Fast Streaming', desc: 'Buffer-free anime with our fastest servers' },
+                  { icon: Shield, title: 'No Speed Limits', desc: 'Unlimited streaming without throttling' },
+                  { icon: Star, title: 'Premium Badge', desc: 'Show off your support with a special badge' },
+                  { icon: Gift, title: 'Support the Platform', desc: 'Help keep mistani.lol running ad-free' },
+                ].map((benefit, i) => (
+                  <div 
+                    key={benefit.title} 
+                    className="flex items-start space-x-4 p-4 rounded-xl bg-gray-700/50 hover:bg-gray-700 transition-colors"
+                  >
+                    <div className="p-2 bg-amber-500/20 rounded-lg">
+                      <benefit.icon className="w-6 h-6 text-amber-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-semibold mb-1">{benefit.title}</h3>
+                      <p className="text-gray-400 text-sm">{benefit.desc}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="w-6 h-6 text-amber-500" />
-                  <div>
-                    <h4 className="text-white font-semibold">No Speed Limits</h4>
-                    <p className="text-gray-400 text-sm">Free users experience speed throttling - premium users get unlimited speed</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Star className="w-6 h-6 text-amber-500" />
-                  <div>
-                    <h4 className="text-white font-semibold">Premium Badge</h4>
-                    <p className="text-gray-400 text-sm">Show off your premium status with a special badge on your profile</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Gift className="w-6 h-6 text-amber-500" />
-                  <div>
-                    <h4 className="text-white font-semibold">Support mistani.lol</h4>
-                    <p className="text-gray-400 text-sm">Your donation helps keep the platform running and ad-free</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
-            <div className="bg-gray-800 rounded-lg p-6">
-              <h3 className="text-xl font-semibold text-white mb-4">How Premium Works</h3>
-              <div className="space-y-4 text-gray-300">
-                <p>
-                  Premium is activated through Ko-fi donations. Simply donate $5 or more to unlock premium features for 1 month.
+            <div className="bg-gray-800 rounded-2xl p-8 animate-slideUp" style={{ animationDelay: '100ms' }}>
+              <div className="text-center mb-8">
+                <Sparkles className="w-8 h-8 text-amber-500 mx-auto mb-2" />
+                <h2 className="text-2xl font-bold text-white mb-2">Choose Your Plan</h2>
+                <p className="text-gray-400">Select a donation amount to unlock premium</p>
+              </div>
+              
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                {PREMIUM_TIERS.map((tier) => (
+                  <button
+                    key={tier.amount}
+                    onClick={() => handleKoFiDonate(tier.amount)}
+                    disabled={processing}
+                    className={`relative p-6 rounded-xl transition-all hover-lift ${
+                      tier.popular 
+                        ? 'bg-gradient-to-br from-amber-500 to-yellow-500 text-black' 
+                        : 'bg-gray-700 hover:bg-gray-600 text-white'
+                    }`}
+                  >
+                    {tier.popular && (
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        POPULAR
+                      </span>
+                    )}
+                    <div className="text-3xl font-bold mb-1">${tier.amount}</div>
+                    <div className="text-sm opacity-80">{tier.label}</div>
+                  </button>
+                ))}
+              </div>
+
+              <div className="bg-gray-700/50 rounded-xl p-6 text-center">
+                <p className="text-gray-300 mb-4">
+                  Payments are securely processed through Ko-fi. After donation, premium is automatically activated within minutes.
                 </p>
-                <div className="bg-gray-700 rounded p-4">
-                  <h4 className="font-semibold text-amber-400 mb-2">Donation Tiers:</h4>
-                  <ul className="space-y-1 text-sm">
-                    <li>$5 - 1 month premium</li>
-                    <li>$10 - 2 months premium</li>
-                    <li>$25 - 5 months premium</li>
-                    <li>$50+ - 10+ months premium</li>
-                  </ul>
+                <div className="flex items-center justify-center space-x-6 text-sm text-gray-400">
+                  <span className="flex items-center"><Clock className="w-4 h-4 mr-1" /> Auto-activation</span>
+                  <span className="flex items-center"><Shield className="w-4 h-4 mr-1" /> Secure payment</span>
+                  <span className="flex items-center"><CheckCircle className="w-4 h-4 mr-1" /> Cancel anytime</span>
                 </div>
               </div>
-            </div>
 
-            <div className="text-center">
-              <a
-                href="https://ko-fi.com/mistlol"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black px-8 py-4 rounded-lg font-semibold transition-all transform hover:scale-105"
-              >
-                <Crown className="w-6 h-6" />
-                <span>Upgrade to Premium</span>
-              </a>
-              <p className="text-gray-400 text-sm mt-3">
-                Secure payment through Ko-fi
-              </p>
+              <div className="text-center mt-6">
+                <a
+                  href="https://ko-fi.com/mistlol"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center space-x-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black px-8 py-4 rounded-xl font-bold transition-all hover:scale-105 hover:shadow-lg hover:shadow-amber-500/25"
+                >
+                  <Crown className="w-6 h-6" />
+                  <span>Support on Ko-fi</span>
+                </a>
+                <p className="text-gray-500 text-sm mt-3">
+                  Already donated? <Link href="/faq" className="text-amber-500 hover:underline">Check FAQ</Link> for activation help
+                </p>
+              </div>
             </div>
           </div>
         )}

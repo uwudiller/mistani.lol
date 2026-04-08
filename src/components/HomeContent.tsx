@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Search, Play, Clock, TrendingUp, User, LogOut, Shield, Eye, Zap, Crown, Lock, Database, Trash2 } from 'lucide-react'
+import { Search, Play, Clock, TrendingUp, User, LogOut, Shield, Eye, Zap, Crown, Lock, Database, Trash2, Settings } from 'lucide-react'
 import { Anime } from '@/lib/anime'
 import PremiumBadge, { PremiumBanner } from '@/components/PremiumBadge'
 import { useSpeedControl } from '@/lib/speedControl'
@@ -262,8 +262,14 @@ export default function HomeContent() {
                 <Link href="/terms" className="text-gray-400 hover:text-white transition-colors text-sm">
                   Terms
                 </Link>
+                <Link href="/settings" className="text-gray-400 hover:text-white transition-colors text-sm flex items-center">
+                  <Settings className="w-4 h-4" />
+                </Link>
               </div>
               <PremiumBadge />
+              <Link href="/settings" className="text-gray-400 hover:text-amber-500 transition-colors">
+                <Settings className="w-5 h-5 md:hidden" />
+              </Link>
               <div className="flex items-center space-x-2">
                 <User className="w-5 h-5 text-gray-400" />
                 <span className="text-white hidden md:inline">{session.data?.user?.email}</span>
@@ -284,23 +290,24 @@ export default function HomeContent() {
         <PremiumBanner />
 
         {continueWatching.length > 0 && (
-          <section className="mb-12 fade-in">
+          <section className="mb-12 animate-slideUp">
             <div className="flex items-center mb-6">
               <Clock className="w-6 h-6 text-amber-500 mr-2" />
               <h2 className="text-2xl font-bold text-white">Continue Watching</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {continueWatching.map((item) => (
+              {continueWatching.map((item, i) => (
                 <Link
                   key={item.id}
                   href={`/watch/${item.anime_id}?episode=${item.episode}`}
                   className="anime-card bg-gray-800 rounded-lg overflow-hidden cursor-pointer"
+                  style={{ animationDelay: `${i * 100}ms` }}
                 >
-                  <div className="relative">
+                  <div className="relative overflow-hidden">
                     <img
                       src={item.anime.image_url || '/placeholder.jpg'}
                       alt={item.anime_title}
-                      className="w-full h-48 object-cover"
+                      className="w-full h-48 object-cover transition-transform duration-500 hover:scale-110"
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
                       <h3 className="text-white font-semibold truncate">{item.anime_title}</h3>
@@ -311,9 +318,9 @@ export default function HomeContent() {
                     </div>
                   </div>
                   <div className="p-4">
-                    <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
                       <div
-                        className="bg-amber-500 h-2 rounded-full"
+                        className="bg-amber-500 h-2 rounded-full transition-all duration-500"
                         style={{ width: `${(item.progress_seconds / item.total_seconds) * 100}%` }}
                       />
                     </div>
@@ -324,24 +331,30 @@ export default function HomeContent() {
           </section>
         )}
 
-        <section className="fade-in">
+        <section className="animate-slideUp" style={{ animationDelay: continueWatching.length > 0 ? '200ms' : '0ms' }}>
           <div className="flex items-center mb-6">
             <TrendingUp className="w-6 h-6 text-amber-500 mr-2" />
             <h2 className="text-2xl font-bold text-white">Trending Anime</h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {trendingAnime.map((anime) => (
+            {trendingAnime.map((anime, i) => (
               <Link
                 key={anime.id}
                 href={`/anime/${anime.id}`}
                 className="anime-card bg-gray-800 rounded-lg overflow-hidden cursor-pointer"
+                style={{ animationDelay: `${i * 50}ms` }}
               >
-                <div className="relative">
+                <div className="relative overflow-hidden">
                   <img
                     src={anime.image_url || '/placeholder.jpg'}
                     alt={anime.title}
-                    className="w-full h-64 object-cover"
+                    className="w-full h-64 object-cover transition-transform duration-500 hover:scale-110"
                   />
+                  {anime.rating && (
+                    <div className="absolute top-2 right-2 bg-amber-500 text-black px-2 py-1 rounded text-xs font-semibold">
+                      {anime.rating.toFixed(1)}
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute bottom-0 left-0 right-0 p-4">
                       <h3 className="text-white font-semibold text-sm line-clamp-2">{anime.title}</h3>
