@@ -15,8 +15,6 @@ KOFI_WEBHOOK_SECRET="dfd5ffd6-3c5c-478e-ab6b-183c99756216"
 KOFI_USERNAME="mistlol"
 
 # Email (for password reset)
-SMTP_HOST="smtp.gmail.com"
-SMTP_PORT=587
-SMTP_USER="your-email@gmail.com"
-SMTP_PASS="your-app-password"
-FROM_EMAIL="noreply@mistani.lol"
+RESEND_API_KEY="re_your_resend_api_key"
+FROM_EMAIL="noreply@your-domain.vercel.app"
+FROM_NAME="mistani.lol"

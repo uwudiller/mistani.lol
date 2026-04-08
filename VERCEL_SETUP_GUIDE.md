@@ -55,24 +55,30 @@ This guide will walk you through setting up mistani.lol on Vercel with all neces
 
 ---
 
-## Database Setup (Vercel Postgres)
+## Database Setup (Neon Database)
 
-### 1. Create Vercel Postgres Database
-1. In Vercel dashboard, click **Storage** in the sidebar
-2. Click **Create Database**
-3. Select **Postgres**
-4. Choose your region (closest to your users)
-5. Database name: `mistani-db`
-6. Click **Create Database**
+### 1. Create Neon Database
+1. Go to [Neon Console](https://console.neon.tech)
+2. Click **Sign Up** (or **Sign In** if you have an account)
+3. Click **Create a project**
+4. Project name: `mistani-db`
+5. Choose your region (closest to your users)
+6. PostgreSQL version: 15 (default)
+7. Click **Create Project**
 
 ### 2. Get Database Connection Strings
-After creation, you'll see your database details. Copy these:
+After creation, you'll see your project dashboard. Copy these:
 
 **Connection Strings:**
 ```
-POSTGRES_PRISMA_URL=postgres://default:[password]@[host]:[port]/[database]?sslmode=require
-POSTGRES_URL_NON_POOLING=postgres://default:[password]@[host]:[port]/[database]?sslmode=require
+POSTGRES_PRISMA_URL=postgresql://[username]:[password]@[host]/[dbname]?sslmode=require
+POSTGRES_URL_NON_POOLING=postgresql://[username]:[password]@[host]/[dbname]?sslmode=require
 ```
+
+**Where to find:**
+- In your Neon project dashboard
+- Click **Connection Details** tab
+- Copy the **Connection string** (both are the same for Neon)
 
 **Save these somewhere secure - you'll need them for environment variables.**
 
@@ -90,11 +96,11 @@ POSTGRES_URL_NON_POOLING=postgres://default:[password]@[host]:[port]/[database]?
 #### Database Variables
 ```
 Variable Name: POSTGRES_PRISMA_URL
-Value: postgres://default:[password]@[host]:[port]/[database]?sslmode=require
+Value: postgresql://[username]:[password]@[host]/[dbname]?sslmode=require
 Environment: Production, Preview, Development
 
 Variable Name: POSTGRES_URL_NON_POOLING
-Value: postgres://default:[password]@[host]:[port]/[database]?sslmode=require
+Value: postgresql://[username]:[password]@[host]/[dbname]?sslmode=require
 Environment: Production, Preview, Development
 ```
 
@@ -192,10 +198,11 @@ Watch the deployment logs for any errors:
 ### 1. Initialize Database Schema
 After successful deployment, you need to create the database tables:
 
-#### Option A: Through Vercel Postgres UI
-1. Go to **Storage** > your database
-2. Click **Query**
-3. Run this command:
+#### Option A: Through Neon Console UI
+1. Go to [Neon Console](https://console.neon.tech)
+2. Select your `mistani-db` project
+3. Click **SQL Editor** (or **Query**)
+4. Run this command to verify connection:
    ```sql
    -- Tables will be created automatically on first API call
    -- You can verify by running: SELECT * FROM users;
@@ -254,8 +261,8 @@ After successful deployment, you need to create the database tables:
 Copy this checklist and verify each variable is set:
 
 ### Database
-- [ ] `POSTGRES_PRISMA_URL`
-- [ ] `POSTGRES_URL_NON_POOLING`
+- [ ] `POSTGRES_PRISMA_URL` (from Neon)
+- [ ] `POSTGRES_URL_NON_POOLING` (from Neon)
 
 ### Authentication
 - [ ] `NEXTAUTH_SECRET` (32+ random characters)
@@ -286,7 +293,8 @@ Copy this checklist and verify each variable is set:
 **Error**: `Can't reach database server`
 **Solution**:
 - Verify `POSTGRES_PRISMA_URL` is correct
-- Check if database is created in Vercel
+- Check if database is created in Neon
+- Ensure URL uses `postgresql://` not `postgres://`
 - Ensure SSL is enabled in connection string
 
 #### 2. Build Failures
@@ -333,9 +341,10 @@ Copy this checklist and verify each variable is set:
 4. Look for error messages
 
 #### Database Query
-1. Go to **Storage** > your database
-2. Click **Query**
-3. Run SQL queries to debug data
+1. Go to [Neon Console](https://console.neon.tech)
+2. Select your `mistani-db` project
+3. Click **SQL Editor**
+4. Run SQL queries to debug data
 
 #### Local Testing
 1. Set up local environment variables
@@ -376,9 +385,9 @@ Copy this checklist and verify each variable is set:
 - Rotate secrets periodically
 
 ### 2. Database Security
-- Use connection pooling
-- Enable SSL for all connections
-- Monitor for unusual activity
+- Use connection pooling (Neon handles automatically)
+- Enable SSL for all connections (default in Neon)
+- Monitor for unusual activity in Neon dashboard
 
 ### 3. API Security
 - Rate limiting is implemented

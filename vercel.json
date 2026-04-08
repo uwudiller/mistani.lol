@@ -16,6 +16,9 @@
     "JIKAN_API_BASE_URL": "@jikan_api_base_url",
     "ANILIST_API_BASE_URL": "@anilist_api_base_url",
     "KOFI_WEBHOOK_SECRET": "@kofi_webhook_secret",
-    "KOFI_USERNAME": "@kofi_username_mistlol"
+    "KOFI_USERNAME": "@kofi_username_mistlol",
+  "RESEND_API_KEY": "@resend_api_key",
+  "FROM_EMAIL": "@from_email",
+  "FROM_NAME": "@from_name"
   }
 }
