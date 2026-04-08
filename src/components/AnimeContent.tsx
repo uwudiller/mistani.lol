@@ -157,18 +157,19 @@ export default function AnimeContent() {
             <div className="bg-gray-800 rounded-lg p-6">
               <h2 className="text-xl font-semibold text-white mb-4">Episodes</h2>
               <div className="space-y-2">
-                {anime.episodes?.map((episode) => (
-                  <Link
-                    key={episode.id}
-                    href={`/watch/${anime.id}?episode=${episode.number}`}
-                    className="block p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="text-white">Episode {episode.number}</span>
-                      <span className="text-gray-400 text-sm">{episode.title}</span>
-                    </div>
-                  </Link>
-                )) || (
+                {anime.episodes ? (
+                  Array.from({ length: Math.min(anime.episodes, 24) }, (_, i) => i + 1).map((ep) => (
+                    <Link
+                      key={ep}
+                      href={`/watch/${anime.id}?episode=${ep}`}
+                      className="block p-3 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-white">Episode {ep}</span>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
                   <p className="text-gray-400">No episodes available</p>
                 )}
               </div>

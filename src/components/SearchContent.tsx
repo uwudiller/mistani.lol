@@ -142,17 +142,16 @@ export default function SearchContent() {
                 >
                   <div className="aspect-[3/4] bg-gray-700 relative">
                     <img
-                      src={anime.images?.jpg?.image_url || '/placeholder.jpg'}
+                      src={anime.image_url || '/placeholder.jpg'}
                       alt={anime.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
                     <div className="absolute top-2 right-2 bg-amber-500 text-black px-2 py-1 rounded text-xs font-semibold">
-                      {anime.score && anime.score.toFixed(1)}
+                      {anime.rating && anime.rating.toFixed(1)}
                     </div>
                   </div>
                   <div className="p-3">
                     <h3 className="font-semibold text-white mb-1 line-clamp-2">{anime.title}</h3>
-                    <p className="text-gray-400 text-xs">{anime.type}</p>
                     {anime.year && (
                       <p className="text-gray-400 text-xs">{anime.year}</p>
                     )}

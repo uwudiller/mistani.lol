@@ -15,7 +15,6 @@ ANILIST_API_BASE_URL=https://graphql.anilist.co
 # KO-FI INTEGRATION
 KOFI_WEBHOOK_SECRET=dfd5ffd6-3c5c-478e-ab6b-183c99756216
 KOFI_USERNAME=mistlol
-
 # EMAIL (Resend)
 RESEND_API_KEY=re_3byj564p_NoYEPPtaq2oevQhHgoJqpSdX
 FROM_EMAIL=admin@mistbio.lol
