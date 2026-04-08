@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Search, Play, Star, Calendar, ArrowLeft } from 'lucide-react'
+import { Search, Play, Star, Calendar, ArrowLeft, Loader2 } from 'lucide-react'
 import { Anime } from '@/lib/anime'
 
 export default function SearchContent() {
@@ -66,8 +66,9 @@ export default function SearchContent() {
 
   if (session.status === 'loading') {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center">
+        <Loader2 className="w-12 h-12 text-amber-500 animate-spin mb-4" />
+        <p className="text-white text-lg animate-pulse">Loading...</p>
       </div>
     )
   }
@@ -147,7 +148,7 @@ export default function SearchContent() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
                     <div className="absolute top-2 right-2 bg-amber-500 text-black px-2 py-1 rounded text-xs font-semibold">
-                      {anime.rating && anime.rating.toFixed(1)}
+                      {anime.score && anime.score.toFixed(1)}
                     </div>
                   </div>
                   <div className="p-3">

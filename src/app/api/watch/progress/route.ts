@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get anime details to store title
-    const anime = await getAnimeById(parseInt(animeId))
+    const { anime } = await getAnimeById(parseInt(animeId))
     if (!anime) {
       return NextResponse.json(
         { error: 'Anime not found' },

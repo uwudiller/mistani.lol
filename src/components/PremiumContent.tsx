@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
-import { ArrowLeft, Crown, Zap, CheckCircle, Star, Gift, Loader2, Sparkles, Shield, Clock } from 'lucide-react'
+import { ArrowLeft, Crown, Zap, Shield, Loader2, Check, Lock, Clock, Sparkles, Star, Gift, ExternalLink, Copy, CheckCircle } from 'lucide-react'
 
 interface PremiumStatus {
   is_premium: boolean
@@ -13,17 +13,18 @@ interface PremiumStatus {
 }
 
 const PREMIUM_TIERS = [
-  { amount: 5, months: 1, label: '1 Month', popular: false },
+  { amount: 5, months: 1, label: '1 Month' },
   { amount: 10, months: 2, label: '2 Months', popular: true },
-  { amount: 25, months: 5, label: '5 Months', popular: false },
-  { amount: 50, months: 12, label: '1 Year', popular: false },
+  { amount: 25, months: 5, label: '5 Months' },
+  { amount: 50, months: 12, label: '1 Year' },
 ]
 
 export default function PremiumContent() {
   const session = useSession()
   const [premiumStatus, setPremiumStatus] = useState<PremiumStatus | null>(null)
   const [loading, setLoading] = useState(true)
-  const [processing, setProcessing] = useState(false)
+  const [showInstructions, setShowInstructions] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     if (session.status === 'authenticated') {
@@ -47,11 +48,10 @@ export default function PremiumContent() {
     }
   }
 
-  const handleKoFiDonate = (amount: number) => {
-    setProcessing(true)
-    const koFiUrl = `https://ko-fi.com/mistlol/?donate=checkout&amount=${amount}&hide_ghipping=true`
-    window.open(koFiUrl, '_blank', 'noopener,noreferrer')
-    setTimeout(() => setProcessing(false), 2000)
+  const copyReferralCode = () => {
+    navigator.clipboard.writeText(session?.data?.user?.email || '')
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   if (session.status === 'loading' || loading) {
@@ -93,12 +93,13 @@ export default function PremiumContent() {
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center space-x-2 text-amber-500 hover:text-amber-400 transition-colors group">
               <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-              <span>Back to Home</span>
+              <span>Back</span>
             </Link>
             <div className="flex items-center space-x-2">
               <Crown className="w-5 h-5 text-amber-500" />
               <span className="text-white font-semibold">Premium</span>
             </div>
+            <div className="w-16" />
           </div>
         </div>
       </header>
@@ -112,7 +113,7 @@ export default function PremiumContent() {
             <span className="text-amber-500">mistani</span>.lol Premium
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Unlock the ultimate anime streaming experience with lightning-fast speeds and no throttling
+            Unlock lightning-fast streaming with no throttling. Support the platform and enjoy the best experience.
           </p>
         </div>
 
@@ -182,16 +183,17 @@ export default function PremiumContent() {
             <div className="bg-gray-800 rounded-2xl p-8 animate-slideUp" style={{ animationDelay: '100ms' }}>
               <div className="text-center mb-8">
                 <Sparkles className="w-8 h-8 text-amber-500 mx-auto mb-2" />
-                <h2 className="text-2xl font-bold text-white mb-2">Choose Your Plan</h2>
-                <p className="text-gray-400">Select a donation amount to unlock premium</p>
+                <h2 className="text-2xl font-bold text-white mb-2">Go Premium via Ko-fi</h2>
+                <p className="text-gray-400">Support us and get instant premium access</p>
               </div>
               
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 {PREMIUM_TIERS.map((tier) => (
-                  <button
+                  <a
                     key={tier.amount}
-                    onClick={() => handleKoFiDonate(tier.amount)}
-                    disabled={processing}
+                    href={`https://ko-fi.com/mistlol?amount=${tier.amount}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={`relative p-6 rounded-xl transition-all hover-lift ${
                       tier.popular 
                         ? 'bg-gradient-to-br from-amber-500 to-yellow-500 text-black' 
@@ -205,33 +207,49 @@ export default function PremiumContent() {
                     )}
                     <div className="text-3xl font-bold mb-1">${tier.amount}</div>
                     <div className="text-sm opacity-80">{tier.label}</div>
-                  </button>
+                  </a>
                 ))}
               </div>
 
-              <div className="bg-gray-700/50 rounded-xl p-6 text-center">
-                <p className="text-gray-300 mb-4">
-                  Payments are securely processed through Ko-fi. After donation, premium is automatically activated within minutes.
-                </p>
-                <div className="flex items-center justify-center space-x-6 text-sm text-gray-400">
-                  <span className="flex items-center"><Clock className="w-4 h-4 mr-1" /> Auto-activation</span>
-                  <span className="flex items-center"><Shield className="w-4 h-4 mr-1" /> Secure payment</span>
-                  <span className="flex items-center"><CheckCircle className="w-4 h-4 mr-1" /> Cancel anytime</span>
-                </div>
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-6 mb-6">
+                <h3 className="text-lg font-bold text-amber-500 mb-4 flex items-center">
+                  <CheckCircle className="w-5 h-5 mr-2" />
+                  How to Activate Premium
+                </h3>
+                <ol className="space-y-3 text-gray-300">
+                  <li className="flex items-start">
+                    <span className="bg-amber-500 text-black w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">1</span>
+                    Click any donation tier above to open Ko-fi
+                  </li>
+                  <li className="flex items-start">
+                    <span className="bg-amber-500 text-black w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">2</span>
+                    Complete your donation on Ko-fi
+                  </li>
+                  <li className="flex items-start">
+                    <span className="bg-amber-500 text-black w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold mr-3 flex-shrink-0">3</span>
+                    Premium activates automatically within 5 minutes!
+                  </li>
+                </ol>
               </div>
 
-              <div className="text-center mt-6">
+              <div className="flex items-center justify-center space-x-6 text-sm text-gray-400 mb-6">
+                <span className="flex items-center"><Lock className="w-4 h-4 mr-1" /> Secure payment</span>
+                <span className="flex items-center"><Clock className="w-4 h-4 mr-1" /> Instant activation</span>
+              </div>
+
+              <div className="text-center">
                 <a
                   href="https://ko-fi.com/mistlol"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black px-8 py-4 rounded-xl font-bold transition-all hover:scale-105 hover:shadow-lg hover:shadow-amber-500/25"
+                  className="inline-flex items-center space-x-2 bg-pink-500 hover:bg-pink-400 text-white px-8 py-4 rounded-xl font-bold transition-all hover:scale-105 hover:shadow-lg hover:shadow-pink-500/25"
                 >
                   <Crown className="w-6 h-6" />
                   <span>Support on Ko-fi</span>
+                  <ExternalLink className="w-4 h-4" />
                 </a>
                 <p className="text-gray-500 text-sm mt-3">
-                  Already donated? <Link href="/faq" className="text-amber-500 hover:underline">Check FAQ</Link> for activation help
+                  Already donated? Premium activates automatically within 5 minutes.
                 </p>
               </div>
             </div>

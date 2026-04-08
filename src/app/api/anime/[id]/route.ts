@@ -16,7 +16,7 @@ export async function GET(
   }
 
   try {
-    const anime = await getAnimeById(malId)
+    const { anime, relations, recommendations } = await getAnimeById(malId)
     
     if (!anime) {
       return NextResponse.json(

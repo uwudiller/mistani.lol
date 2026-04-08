@@ -4,8 +4,21 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Search, Play, Clock, TrendingUp, User, LogOut, Shield, Eye, Zap, Crown, Lock, Database, Trash2, Settings } from 'lucide-react'
+import { Search, Clock, TrendingUp, User, LogOut, Shield, Database, Trash2, Settings, ChevronRight, Loader2 } from 'lucide-react'
 import { Anime } from '@/lib/anime'
+
+interface ContinueWatchingItem {
+  id: string
+  anime_id: string
+  episode: number
+  progress_seconds: number
+  total_seconds: number
+  anime: {
+    title: string
+    image_url?: string
+  }
+  anime_title: string
+}
 import PremiumBadge, { PremiumBanner } from '@/components/PremiumBadge'
 import { useSpeedControl } from '@/lib/speedControl'
 import { Crown as CrownIcon } from 'lucide-react'
@@ -15,7 +28,7 @@ export default function HomeContent() {
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   const [trendingAnime, setTrendingAnime] = useState<Anime[]>([])
-  const [continueWatching, setContinueWatching] = useState<any[]>([])
+  const [continueWatching, setContinueWatching] = useState<ContinueWatchingItem[]>([])
   const [loading, setLoading] = useState(true)
   const [isPremium, setIsPremium] = useState(false)
 
@@ -85,8 +98,9 @@ export default function HomeContent() {
 
   if (session.status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center">
+        <Loader2 className="w-12 h-12 text-amber-500 animate-spin mb-4" />
+        <p className="text-white text-lg animate-pulse">Loading...</p>
       </div>
     )
   }
@@ -161,8 +175,8 @@ export default function HomeContent() {
                   <TrendingUp className="w-6 h-6 text-amber-500 mr-2" />
                   <h2 className="text-2xl font-bold text-white">Trending Now</h2>
                 </div>
-                <Link href="/search" className="text-amber-500 hover:text-amber-400 transition-colors">
-                  View All
+                <Link href="/browse" className="text-amber-500 hover:text-amber-400 transition-colors flex items-center">
+                  View All <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
@@ -178,9 +192,9 @@ export default function HomeContent() {
                         alt={anime.title}
                         className="w-full h-64 object-cover"
                       />
-                      {anime.rating && (
+                      {anime.score && (
                         <div className="absolute top-2 right-2 bg-amber-500 text-black px-2 py-1 rounded text-xs font-semibold">
-                          {anime.rating.toFixed(1)}
+                          {anime.score.toFixed(1)}
                         </div>
                       )}
                     </div>
@@ -350,16 +364,16 @@ export default function HomeContent() {
                     alt={anime.title}
                     className="w-full h-64 object-cover transition-transform duration-500 hover:scale-110"
                   />
-                  {anime.rating && (
+                  {anime.score && (
                     <div className="absolute top-2 right-2 bg-amber-500 text-black px-2 py-1 rounded text-xs font-semibold">
-                      {anime.rating.toFixed(1)}
+                      {anime.score.toFixed(1)}
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
                     <div className="absolute bottom-0 left-0 right-0 p-4">
                       <h3 className="text-white font-semibold text-sm line-clamp-2">{anime.title}</h3>
-                      {anime.rating && (
-                        <p className="text-amber-500 text-xs">Rating: {anime.rating.toFixed(1)}</p>
+                      {anime.score && (
+                        <p className="text-amber-500 text-xs">Score: {anime.score.toFixed(1)}</p>
                       )}
                     </div>
                   </div>

@@ -1,4 +1,4 @@
-interface SpeedConfig {
+export interface SpeedConfig {
   freeUserDelay: number
   premiumUserDelay: number
   apiRateLimit: {
@@ -9,6 +9,9 @@ interface SpeedConfig {
     free: '480p' | '720p'
     premium: '720p' | '1080p' | '4k'
   }
+  bufferDelay: number
+  chunkDelay: number
+  initialLoadDelay: number
 }
 
 export class SpeedControlService {
@@ -17,16 +20,19 @@ export class SpeedControlService {
 
   constructor() {
     this.config = {
-      freeUserDelay: 2000, // 2 second delay for free users
-      premiumUserDelay: 0, // No delay for premium users
+      freeUserDelay: 2000,
+      premiumUserDelay: 0,
       apiRateLimit: {
-        free: 60, // 60 requests per minute for free users
-        premium: 300 // 300 requests per minute for premium users
+        free: 30,
+        premium: 300
       },
       videoQuality: {
         free: '480p',
         premium: '1080p'
-      }
+      },
+      bufferDelay: 3000,
+      chunkDelay: 1500,
+      initialLoadDelay: 2500
     }
   }
 
@@ -53,32 +59,49 @@ export class SpeedControlService {
   }
 
   getSearchDelay(isPremium: boolean): number {
-    // Free users get 500ms delay on search, premium users get instant results
-    return isPremium ? 0 : 500
+    return isPremium ? 0 : 300
   }
 
   getVideoLoadDelay(isPremium: boolean): number {
-    // Free users get 1 second delay before video starts
-    return isPremium ? 0 : 1000
+    if (isPremium) return 0
+    return this.config.initialLoadDelay
+  }
+
+  getBufferDelay(isPremium: boolean): number {
+    if (isPremium) return 0
+    return this.config.bufferDelay
+  }
+
+  getChunkDelay(isPremium: boolean): number {
+    if (isPremium) return 0
+    return this.config.chunkDelay
   }
 
   shouldShowAds(isPremium: boolean): boolean {
-    // Premium users don't see ads
     return !isPremium
   }
 
   getMaxConcurrentStreams(isPremium: boolean): number {
-    // Free users limited to 1 stream, premium users can have 3
     return isPremium ? 3 : 1
   }
 
   getCacheDuration(isPremium: boolean): number {
-    // Premium users get longer cache duration (better performance)
-    return isPremium ? 3600000 : 1800000 // 1 hour vs 30 minutes
+    return isPremium ? 3600000 : 900000
+  }
+
+  async delayForVideo(isPremium: boolean): Promise<void> {
+    if (isPremium) return
+    
+    await new Promise(resolve => setTimeout(resolve, this.config.initialLoadDelay))
+  }
+
+  async delayForBuffer(isPremium: boolean): Promise<void> {
+    if (isPremium) return
+    
+    await new Promise(resolve => setTimeout(resolve, this.config.bufferDelay))
   }
 }
 
-// React hook for speed control
 export function useSpeedControl(isPremium: boolean) {
   const speedControl = SpeedControlService.getInstance()
 
@@ -88,8 +111,16 @@ export function useSpeedControl(isPremium: boolean) {
     getVideoQuality: () => speedControl.getVideoQuality(isPremium),
     getSearchDelay: () => speedControl.getSearchDelay(isPremium),
     getVideoLoadDelay: () => speedControl.getVideoLoadDelay(isPremium),
+    getBufferDelay: () => speedControl.getBufferDelay(isPremium),
+    getChunkDelay: () => speedControl.getChunkDelay(isPremium),
     shouldShowAds: () => speedControl.shouldShowAds(isPremium),
     getMaxConcurrentStreams: () => speedControl.getMaxConcurrentStreams(isPremium),
-    getCacheDuration: () => speedControl.getCacheDuration(isPremium)
+    getCacheDuration: () => speedControl.getCacheDuration(isPremium),
+    delayForVideo: () => speedControl.delayForVideo(isPremium),
+    delayForBuffer: () => speedControl.delayForBuffer(isPremium)
   }
+}
+
+export function getSpeedControlConfig() {
+  return SpeedControlService.getInstance()
 }
