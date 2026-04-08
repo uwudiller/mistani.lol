@@ -52,8 +52,9 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error('Registration error:', error)
+    const message = error instanceof Error ? error.message : 'Unknown error'
     return NextResponse.json(
-      { error: 'Failed to create user' },
+      { error: 'Failed to create user', details: message },
       { status: 500 }
     )
   }

@@ -4,11 +4,11 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Search, Play, Clock, TrendingUp, User, LogOut } from 'lucide-react'
+import { Search, Play, Clock, TrendingUp, User, LogOut, Shield, Eye, Zap, Crown, Lock, Database, Trash2 } from 'lucide-react'
 import { Anime } from '@/lib/anime'
 import PremiumBadge, { PremiumBanner } from '@/components/PremiumBadge'
 import { useSpeedControl } from '@/lib/speedControl'
-import { Crown } from 'lucide-react'
+import { Crown as CrownIcon } from 'lucide-react'
 
 export default function HomeContent() {
   const session = useSession()
@@ -20,14 +20,10 @@ export default function HomeContent() {
   const [isPremium, setIsPremium] = useState(false)
 
   useEffect(() => {
-    if (session.status === 'unauthenticated') {
-      router.push('/auth/signin')
-    }
-  }, [session.status, router])
-
-  useEffect(() => {
     if (session.status === 'authenticated') {
       fetchDashboardData()
+    } else if (session.status === 'unauthenticated') {
+      fetchTrendingOnly()
     }
   }, [session.status])
 
@@ -35,7 +31,6 @@ export default function HomeContent() {
     try {
       setLoading(true)
       
-      // Apply speed control delay for free users
       const speedControl = useSpeedControl(isPremium)
       await speedControl.applyDelay()
       
@@ -66,6 +61,21 @@ export default function HomeContent() {
     }
   }
 
+  const fetchTrendingOnly = async () => {
+    try {
+      setLoading(true)
+      const trendingRes = await fetch('/api/anime/trending?limit=8')
+      if (trendingRes.ok) {
+        const trendingData = await trendingRes.json()
+        setTrendingAnime(trendingData.anime)
+      }
+    } catch (error) {
+      console.error('Error fetching trending anime:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
@@ -82,7 +92,138 @@ export default function HomeContent() {
   }
 
   if (!session.data) {
-    return null
+    return (
+      <div className="min-h-screen bg-gray-900 text-white">
+        {/* Header */}
+        <header className="bg-gray-800 border-b border-gray-700">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <h1 className="text-2xl font-bold text-amber-500">mistani.lol</h1>
+              <div className="flex items-center space-x-4">
+                <Link href="/auth/signin" className="text-gray-400 hover:text-white transition-colors text-sm">
+                  Sign In
+                </Link>
+                <Link href="/auth/signup" className="bg-amber-500 hover:bg-amber-400 text-black px-4 py-2 rounded-lg font-semibold transition-colors text-sm">
+                  Get Started
+                </Link>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Hero Section */}
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold text-white mb-6">
+              Watch Anime <span className="text-amber-500">Privately</span>
+            </h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
+              A privacy-first anime streaming service. No tracking, no ads, no data selling. Your watch history stays on your device.
+            </p>
+            <form onSubmit={handleSearch} className="max-w-md mx-auto">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search anime..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-gray-800 text-white pl-12 pr-4 py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 text-lg"
+                />
+              </div>
+            </form>
+          </div>
+
+          {/* Privacy Features */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div className="bg-gray-800 rounded-xl p-6 text-center">
+              <Shield className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-white mb-2">No Tracking</h3>
+              <p className="text-gray-400">We don't track what you watch. Your viewing history stays private and local.</p>
+            </div>
+            <div className="bg-gray-800 rounded-xl p-6 text-center">
+              <Database className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-white mb-2">Minimal Data</h3>
+              <p className="text-gray-400">We only store what's necessary for your account. Nothing else.</p>
+            </div>
+            <div className="bg-gray-800 rounded-xl p-6 text-center">
+              <Trash2 className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-white mb-2">Delete Anytime</h3>
+              <p className="text-gray-400">Delete your account and all data instantly. No questions asked.</p>
+            </div>
+          </div>
+
+          {/* Trending Anime */}
+          {trendingAnime.length > 0 && (
+            <section>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center">
+                  <TrendingUp className="w-6 h-6 text-amber-500 mr-2" />
+                  <h2 className="text-2xl font-bold text-white">Trending Now</h2>
+                </div>
+                <Link href="/search" className="text-amber-500 hover:text-amber-400 transition-colors">
+                  View All
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4">
+                {trendingAnime.map((anime) => (
+                  <Link
+                    key={anime.id}
+                    href={`/anime/${anime.id}`}
+                    className="bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-amber-500 transition-all"
+                  >
+                    <div className="relative">
+                      <img
+                        src={anime.image_url || '/placeholder.jpg'}
+                        alt={anime.title}
+                        className="w-full h-64 object-cover"
+                      />
+                      {anime.rating && (
+                        <div className="absolute top-2 right-2 bg-amber-500 text-black px-2 py-1 rounded text-xs font-semibold">
+                          {anime.rating.toFixed(1)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <h3 className="text-white font-medium text-sm line-clamp-1">{anime.title}</h3>
+                      {anime.year && (
+                        <p className="text-gray-400 text-xs">{anime.year}</p>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* CTA */}
+          <div className="mt-16 text-center bg-gray-800 rounded-xl p-8">
+            <h3 className="text-2xl font-bold text-white mb-4">Ready to watch privately?</h3>
+            <p className="text-gray-400 mb-6">Join now and start streaming with complete privacy.</p>
+            <Link href="/auth/signup" className="inline-block bg-amber-500 hover:bg-amber-400 text-black px-8 py-3 rounded-lg font-semibold transition-colors">
+              Create Free Account
+            </Link>
+          </div>
+        </main>
+
+        {/* Footer */}
+        <footer className="border-t border-gray-800 mt-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <div className="flex items-center space-x-6 mb-4 md:mb-0">
+                <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors text-sm">Privacy Policy</Link>
+                <Link href="/terms" className="text-gray-400 hover:text-white transition-colors text-sm">Terms of Service</Link>
+                <Link href="/faq" className="text-gray-400 hover:text-white transition-colors text-sm">FAQ</Link>
+                <Link href="/premium" className="text-gray-400 hover:text-white transition-colors text-sm flex items-center">
+                  <CrownIcon className="w-4 h-4 mr-1" /> Premium
+                </Link>
+              </div>
+              <p className="text-gray-500 text-sm">mistani.lol - Privacy-first anime</p>
+            </div>
+          </div>
+        </footer>
+      </div>
+    )
   }
 
   return (
@@ -91,12 +232,8 @@ export default function HomeContent() {
       <header className="bg-gray-800 border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-amber-500">mistani.lol</h1>
-            </div>
+            <h1 className="text-2xl font-bold text-amber-500">mistani.lol</h1>
             
-            {/* Search Bar */}
             <form onSubmit={handleSearch} className="flex-1 max-w-md mx-8">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -110,11 +247,10 @@ export default function HomeContent() {
               </div>
             </form>
 
-            {/* User Menu */}
             <div className="flex items-center space-x-4">
               <div className="hidden md:flex items-center space-x-4">
                 <Link href="/premium" className="text-amber-500 hover:text-amber-400 transition-colors text-sm flex items-center space-x-1">
-                  <Crown className="w-4 h-4" />
+                  <CrownIcon className="w-4 h-4" />
                   <span>Premium</span>
                 </Link>
                 <Link href="/faq" className="text-gray-400 hover:text-white transition-colors text-sm">
@@ -145,10 +281,8 @@ export default function HomeContent() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Premium Banner */}
         <PremiumBanner />
 
-        {/* Continue Watching Section */}
         {continueWatching.length > 0 && (
           <section className="mb-12 fade-in">
             <div className="flex items-center mb-6">
@@ -190,7 +324,6 @@ export default function HomeContent() {
           </section>
         )}
 
-        {/* Trending Anime Section */}
         <section className="fade-in">
           <div className="flex items-center mb-6">
             <TrendingUp className="w-6 h-6 text-amber-500 mr-2" />
