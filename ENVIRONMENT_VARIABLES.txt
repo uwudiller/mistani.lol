@@ -1,0 +1,28 @@
+# mistani.lol Environment Variables - Copy These Exact Values
+
+# DATABASE (Neon)
+POSTGRES_PRISMA_URL=postgresql://neondb_owner:npg_v6fGuhiaJF4I@ep-flat-water-an0si0wr-pooler.c-6.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
+POSTGRES_URL_NON_POOLING=postgresql://neondb_owner:npg_v6fGuhiaJF4I@ep-flat-water-an0si0wr-pooler.c-6.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
+
+# AUTHENTICATION
+NEXTAUTH_SECRET=YUDkU9VmiKWuBci3HU8kSFrn5UsLkPn0
+NEXTAUTH_URL=https://mistani.lol
+
+# ANIME APIS
+JIKAN_API_BASE_URL=https://api.jikan.moe/v4
+ANILIST_API_BASE_URL=https://graphql.anilist.co
+
+# KO-FI INTEGRATION
+KOFI_WEBHOOK_SECRET=dfd5ffd6-3c5c-478e-ab6b-183c99756216
+KOFI_USERNAME=mistlol
+
+# EMAIL (Resend)
+RESEND_API_KEY=re_3byj564p_NoYEPPtaq2oevQhHgoJqpSdX
+FROM_EMAIL=admin@mistbio.lol
+FROM_NAME=mistani.lol
+
+# INSTRUCTIONS:
+1. Generate NEXTAUTH_SECRET: openssl rand -base64 32
+2. Get RESEND_API_KEY: resend.com -> API Keys -> Create
+3. Replace your-domain.vercel.app with your actual Vercel URL
+4. Copy all variables to Vercel Environment Variables
