@@ -13,15 +13,15 @@ interface PremiumStatus {
 }
 
 export default function PremiumPage() {
-  const { data: session, status } = useSession()
+  const session = useSession()
   const [premiumStatus, setPremiumStatus] = useState<PremiumStatus | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (status === 'authenticated') {
+    if (session.status === 'authenticated') {
       fetchPremiumStatus()
     }
-  }, [status])
+  }, [session.status])
 
   const fetchPremiumStatus = async () => {
     try {
@@ -37,7 +37,7 @@ export default function PremiumPage() {
     }
   }
 
-  if (status === 'loading' || loading) {
+  if (session.status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
@@ -45,7 +45,7 @@ export default function PremiumPage() {
     )
   }
 
-  if (!session) {
+  if (!session.data) {
     return null
   }
 
