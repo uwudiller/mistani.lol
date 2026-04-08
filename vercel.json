@@ -9,16 +9,38 @@
     }
   },
   "env": {
-    "POSTGRES_PRISMA_URL": "@POSTGRES_PRISMA_URL",
-    "POSTGRES_URL_NON_POOLING": "@POSTGRES_URL_NON_POOLING",
-    "NEXTAUTH_SECRET": "@NEXTAUTH_SECRET",
-    "NEXTAUTH_URL": "@NEXTAUTH_URL",
-    "JIKAN_API_BASE_URL": "@JIKAN_API_BASE_URL",
-    "ANILIST_API_BASE_URL": "@ANILIST_API_BASE_URL",
-    "KOFI_WEBHOOK_SECRET": "@KOFI_WEBHOOK_SECRET",
-    "KOFI_USERNAME": "@KOFI_USERNAME",
-    "RESEND_API_KEY": "@RESEND_API_KEY",
-    "FROM_EMAIL": "@FROM_EMAIL",
-    "FROM_NAME": "@FROM_NAME"
+    "POSTGRES_PRISMA_URL": {
+      "value": "POSTGRES_PRISMA_URL"
+    },
+    "POSTGRES_URL_NON_POOLING": {
+      "value": "POSTGRES_URL_NON_POOLING"
+    },
+    "NEXTAUTH_SECRET": {
+      "value": "NEXTAUTH_SECRET"
+    },
+    "NEXTAUTH_URL": {
+      "value": "NEXTAUTH_URL"
+    },
+    "JIKAN_API_BASE_URL": {
+      "value": "JIKAN_API_BASE_URL"
+    },
+    "ANILIST_API_BASE_URL": {
+      "value": "ANILIST_API_BASE_URL"
+    },
+    "KOFI_WEBHOOK_SECRET": {
+      "value": "KOFI_WEBHOOK_SECRET"
+    },
+    "KOFI_USERNAME": {
+      "value": "KOFI_USERNAME"
+    },
+    "RESEND_API_KEY": {
+      "value": "RESEND_API_KEY"
+    },
+    "FROM_EMAIL": {
+      "value": "FROM_EMAIL"
+    },
+    "FROM_NAME": {
+      "value": "FROM_NAME"
+    }
   }
 }
