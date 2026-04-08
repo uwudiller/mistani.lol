@@ -346,35 +346,39 @@ export default function HomeContent() {
         )}
 
         <section className="animate-slideUp" style={{ animationDelay: continueWatching.length > 0 ? '200ms' : '0ms' }}>
-          <div className="flex items-center mb-6">
-            <TrendingUp className="w-6 h-6 text-amber-500 mr-2" />
-            <h2 className="text-2xl font-bold text-white">Trending Anime</h2>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center">
+              <TrendingUp className="w-6 h-6 text-amber-500 mr-2" />
+              <h2 className="text-2xl font-bold text-white">Browse Anime</h2>
+            </div>
+            <Link href="/browse" className="text-amber-500 hover:text-amber-400 transition-colors text-sm flex items-center">
+              View All
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {trendingAnime.map((anime, i) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {trendingAnime.slice(0, 8).map((anime, i) => (
               <Link
                 key={anime.id}
                 href={`/anime/${anime.id}`}
                 className="anime-card bg-gray-800 rounded-lg overflow-hidden cursor-pointer"
                 style={{ animationDelay: `${i * 50}ms` }}
               >
-                <div className="relative overflow-hidden">
+                <div className="relative overflow-hidden aspect-[3/4]">
                   <img
                     src={anime.image_url || '/placeholder.jpg'}
                     alt={anime.title}
-                    className="w-full h-64 object-cover transition-transform duration-500 hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    loading="lazy"
                   />
                   {anime.score && (
                     <div className="absolute top-2 right-2 bg-amber-500 text-black px-2 py-1 rounded text-xs font-semibold">
                       {anime.score.toFixed(1)}
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity">
                     <div className="absolute bottom-0 left-0 right-0 p-4">
                       <h3 className="text-white font-semibold text-sm line-clamp-2">{anime.title}</h3>
-                      {anime.score && (
-                        <p className="text-amber-500 text-xs">Score: {anime.score.toFixed(1)}</p>
-                      )}
                     </div>
                   </div>
                 </div>

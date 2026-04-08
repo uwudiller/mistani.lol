@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getHomePage, searchAnime, getAnimeByGenre } from '@/lib/streaming/aniwatch'
 
+const ANIWATCH_API = process.env.ANIWATCH_API_URL || 'https://aniwatch-api-v1-0.onrender.com'
+
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const query = searchParams.get('q')
@@ -9,26 +11,31 @@ export async function GET(request: NextRequest) {
 
   try {
     if (query) {
-      const results = await searchAnime(query, page)
-      return NextResponse.json(results)
+      const response = await fetch(`${ANIWATCH_API}/api/search/${encodeURIComponent(query)}/${page}`)
+      if (!response.ok) return NextResponse.json({ anime: [], hasMore: false })
+      const data = await response.json()
+      return NextResponse.json({
+        anime: data.searchYour || [],
+        hasMore: data.nextpageavailable || false
+      })
     }
 
     if (genre) {
-      const results = await getAnimeByGenre(genre, page)
-      return NextResponse.json(results)
+      const response = await fetch(`${ANIWATCH_API}/api/genre/${encodeURIComponent(genre)}/${page}`)
+      if (!response.ok) return NextResponse.json({ anime: [], hasMore: false })
+      const data = await response.json()
+      return NextResponse.json({
+        anime: data.genreX || [],
+        hasMore: data.nextpageavai || false
+      })
     }
 
-    const home = await getHomePage()
-    if (!home) {
-      return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 })
-    }
-
+    const response = await fetch(`${ANIWATCH_API}/api/mix/tv/${page}`)
+    if (!response.ok) return NextResponse.json({ anime: [], hasMore: false })
+    const data = await response.json()
     return NextResponse.json({
-      slides: home.slides,
-      trending: home.trend,
-      topAiring: home.topAiring,
-      topMovie: home.topMovie,
-      topUpcoming: home.topUpcoming
+      anime: data.mixAni || [],
+      hasMore: data.nextpageavai || false
     })
   } catch (error) {
     console.error('Browse API error:', error)
