@@ -1,0 +1,21 @@
+{
+  "buildCommand": "prisma generate && next build",
+  "devCommand": "next dev",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "POSTGRES_PRISMA_URL": "@postgres_prisma_url",
+    "POSTGRES_URL_NON_POOLING": "@postgres_url_non_pooling",
+    "NEXTAUTH_SECRET": "@nextauth_secret",
+    "NEXTAUTH_URL": "@nextauth_url",
+    "JIKAN_API_BASE_URL": "@jikan_api_base_url",
+    "ANILIST_API_BASE_URL": "@anilist_api_base_url",
+    "KOFI_WEBHOOK_SECRET": "@kofi_webhook_secret",
+    "KOFI_USERNAME": "@kofi_username_mistlol"
+  }
+}

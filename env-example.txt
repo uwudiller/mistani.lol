@@ -1,0 +1,22 @@
+# Database
+POSTGRES_PRISMA_URL="postgresql://username:password@hostname:5432/database?sslmode=require"
+POSTGRES_URL_NON_POOLING="postgresql://username:password@hostname:5432/database?sslmode=require"
+
+# NextAuth.js
+NEXTAUTH_SECRET="your-secret-key-here"
+NEXTAUTH_URL="http://localhost:3000"
+
+# Anime APIs
+JIKAN_API_BASE_URL="https://api.jikan.moe/v4"
+ANILIST_API_BASE_URL="https://graphql.anilist.co"
+
+# Ko-fi Integration
+KOFI_WEBHOOK_SECRET="dfd5ffd6-3c5c-478e-ab6b-183c99756216"
+KOFI_USERNAME="mistlol"
+
+# Email (for password reset)
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT=587
+SMTP_USER="your-email@gmail.com"
+SMTP_PASS="your-app-password"
+FROM_EMAIL="noreply@mistani.lol"
