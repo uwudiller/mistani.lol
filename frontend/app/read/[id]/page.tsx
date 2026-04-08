@@ -27,8 +27,8 @@ export async function generateMetadata({
 
   return {
     title: !mediaInfo
-      ? "Error | AniProject"
-      : `Chapter ${searchParams.chapter} - ${mediaInfo.title.userPreferred} | AniProject`,
+      ? "Error | mistani.lol"
+      : `Chapter ${searchParams.chapter} - ${mediaInfo.title.userPreferred} | mistani.lol`,
     description: `Read ${mediaInfo.title.userPreferred} - Chapter ${
       searchParams.chapter
     }. ${mediaInfo.description && mediaInfo.description}`,

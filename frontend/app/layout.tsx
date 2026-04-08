@@ -13,7 +13,7 @@ import GoogleAnalytics from "./googleAnalytics";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "AniProject",
+  title: "mistani.lol",
   description:
     "A anime platform that showcases popular and trending animes, mangas and movies. Explore the latest releases, keep watching your favorites, and discover what's popular in the anime world.",
   manifest: "/manifest.json",
