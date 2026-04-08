@@ -11,6 +11,8 @@ import { useSpeedControl } from '@/lib/speedControl'
 import { Crown } from 'lucide-react'
 import { Providers } from '@/components/Providers'
 
+export const dynamic = 'force-dynamic'
+
 export default function Home() {
   const session = useSession()
   const router = useRouter()
@@ -19,18 +21,25 @@ export default function Home() {
   const [continueWatching, setContinueWatching] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [isPremium, setIsPremium] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
     if (session.status === 'unauthenticated') {
       router.push('/auth/signin')
     }
-  }, [session.status, router])
+  }, [session.status, router, mounted])
 
   useEffect(() => {
+    if (!mounted) return
     if (session.status === 'authenticated') {
       fetchDashboardData()
     }
-  }, [session.status])
+  }, [session.status, mounted])
 
   const fetchDashboardData = async () => {
     try {
@@ -74,7 +83,7 @@ export default function Home() {
     }
   }
 
-  if (session.status === 'loading' || loading) {
+  if (!mounted || session.status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
