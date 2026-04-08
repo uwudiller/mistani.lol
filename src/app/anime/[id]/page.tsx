@@ -1,13 +1,13 @@
-'use client'
+import { Providers } from '@/components/Providers'
+import AnimeContent from '@/components/AnimeContent'
 
-import { useState, useEffect } from 'react'
-import { useParams, useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
-import Link from 'next/link'
-import { ArrowLeft, Play, Star, Calendar, Clock, Plus, Heart } from 'lucide-react'
-import { Anime } from '@/lib/anime'
-
-export default function AnimeDetailPage() {
+export default function AnimePage() {
+  return (
+    <Providers>
+      <AnimeContent />
+    </Providers>
+  )
+}
   const { data: session, status } = useSession()
   const router = useRouter()
   const params = useParams()

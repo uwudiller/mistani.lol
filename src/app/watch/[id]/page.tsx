@@ -1,17 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { useSession } from 'next-auth/react'
-import Link from 'next/link'
-import { ArrowLeft, Play, Pause, SkipBack, SkipForward, Volume2, Maximize, Settings } from 'lucide-react'
+import { Providers } from '@/components/Providers'
+import WatchContent from '@/components/WatchContent'
 
 export default function WatchPage() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const params = useParams()
-  const searchParams = useSearchParams()
-  const videoRef = useRef<HTMLVideoElement>(null)
   
   const [anime, setAnime] = useState<any>(null)
   const [loading, setLoading] = useState(true)
