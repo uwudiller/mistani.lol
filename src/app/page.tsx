@@ -12,7 +12,7 @@ import { Crown } from 'lucide-react'
 import { Providers } from '@/components/Providers'
 
 export default function Home() {
-  const { data: session, status } = useSession()
+  const session = useSession()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   const [trendingAnime, setTrendingAnime] = useState<Anime[]>([])
@@ -21,16 +21,16 @@ export default function Home() {
   const [isPremium, setIsPremium] = useState(false)
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (session.status === 'unauthenticated') {
       router.push('/auth/signin')
     }
-  }, [status, router])
+  }, [session.status, router])
 
   useEffect(() => {
-    if (status === 'authenticated') {
+    if (session.status === 'authenticated') {
       fetchDashboardData()
     }
-  }, [status])
+  }, [session.status])
 
   const fetchDashboardData = async () => {
     try {
@@ -74,7 +74,7 @@ export default function Home() {
     }
   }
 
-  if (status === 'loading' || loading) {
+  if (session.status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
         <div className="text-white text-xl">Loading...</div>
@@ -82,7 +82,7 @@ export default function Home() {
     )
   }
 
-  if (!session) {
+  if (!session.data) {
     return null
   }
 
@@ -131,7 +131,7 @@ export default function Home() {
                 <PremiumBadge />
                 <div className="flex items-center space-x-2">
                   <User className="w-5 h-5 text-gray-400" />
-                  <span className="text-white hidden md:inline">{session.user?.email}</span>
+                  <span className="text-white hidden md:inline">{session.data?.user?.email}</span>
                 </div>
                 <button
                   onClick={() => router.push('/api/auth/signout')}
